@@ -17,11 +17,11 @@ export const App=()=> {
   const [page, setPage] = useState(1);
   const isFirstRender = useRef(true);
 
-  const fetchImagesWithParams = async(param) => {
+  async function fetchImagesWithParams(searchParam) {
     try{
       setStatus('pending');
       setImages(null);
-      const img = await getImages(param, page)
+      const img = await getImages(searchParam, page)
       setStatus('success');
       setImages(img);
     }
@@ -30,10 +30,10 @@ export const App=()=> {
     }
   }
 
-  const fetchImagesWithPagination = async(newPage) => {
+  async function fetchImagesWithPagination(page) {
     try{
       setStatus('pending');
-      const img = await getImages(searchParam, newPage)
+      const img = await getImages(searchParam, page)
       setImages(prevState => prevState.concat(img));
       setStatus('success')
     }
@@ -63,18 +63,17 @@ export const App=()=> {
   }
 
   useEffect(()=>{
-    if(!isFirstRender.current){
+    if(searchParam){
       fetchImagesWithParams()
     }
-    return () => isFirstRender.current = false;
-  }, [searchParam])
+  }, [searchParam]);
 
-  useEffect(()=>{
-    if(!isFirstRender.current){
-        fetchImagesWithPagination()
-      }
-    return () => isFirstRender.current = false;
-    }, [page])
+  useEffect(() => {
+    if(!isFirstRender.current) {
+      fetchImagesWithPagination()
+    }
+    return () => isFirstRender.current = false
+  }, [page]);
   
 
     const totalHits = JSON.parse(localStorage.getItem('resp'))?.totalHits;
