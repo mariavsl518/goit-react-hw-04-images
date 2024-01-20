@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { getImages } from 'services/api';
 
 import { Searchbar } from './Searchbar/Searchbar';
@@ -7,105 +7,104 @@ import { Button } from './Button/Button';
 import { Modal } from './Modal/Modal';
 import { Loader } from './Loader/Loader';
 
-export class App extends Component {
-  
-  state = {
-    img: null,
-    modalImgURL: null,
-    isModalOpen: false,
-    status: 'idle',
-    searchParam: '',
-    page: 1
-  }
+export const App=()=> {
 
-   handleSearchSubmit = (evt) =>{
-     evt.preventDefault();
-     const searchParam = evt.target.elements.input.value;
-     this.setState({searchParam})
-  }
+  const [images, setImages] = useState(null);
+  const [modalImgURL, setModalImgURL] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [status, setStatus] = useState('idle');
+  const [searchParam, setSearchParam] = useState('');
+  const [page, setPage] = useState(1);
+  const isFirstRender = useRef(true);
 
-  handleLoadMore= ()=>{
-    this.setState({
-      page:this.state.page+1
-    })
-  }
-
-  fetchImagesWithParams = async (searchParam) => {
+  const fetchImagesWithParams = async(param) => {
     try{
-      this.setState({status:'pending', img:null})
-      const img = await getImages(searchParam, this.state.page);
-      this.setState({img, status:'success'});
+      setStatus('pending');
+      setImages(null);
+      const img = await getImages(param, page)
+      setStatus('success');
+      setImages(img);
     }
     catch{
-      this.setState({status:'error'})
+      setStatus('error')
     }
   }
 
-  fetchImagesWithPagination = async (page) => {
+  const fetchImagesWithPagination = async(newPage) => {
     try{
-      this.setState({status:'pending'})
-      const img = await getImages(this.state.searchParam, page);
-      this.setState({
-        img:this.state.img.concat(img), 
-        status:'success'});
+      setStatus('pending');
+      const img = await getImages(searchParam, newPage)
+      setImages(prevState => prevState.concat(img));
+      setStatus('success')
     }
     catch{
-      this.setState({status:'error'})
+      setStatus('error')
     }
   }
 
-  openModalWindow = (key) =>{
-    const elem =  this.state.img.find(elem=>elem.id===key)
-    this.setState({modalImgURL:elem.largeImageURL, isModalOpen:true})
-  }
+  const handleSearchSubmit = (evt) =>{
+    evt.preventDefault();
+    const param = evt.target.elements.input.value;
+    setSearchParam(param)
+ }
 
-  closeModalWindow =() =>{
-    this.setState({isModalOpen:false})
+  const handleLoadMore = () =>{
+    setPage(prevState=>prevState+1)
   }
   
-  componentDidUpdate(prevProps, prevState){
+   const openModalWindow = (key) =>{
+    const elem = images.find(elem=>elem.id===key);
+    setModalImgURL(elem.largeImageURL);
+    setIsModalOpen(true)
+  }
 
-    if(prevState.searchParam !== this.state.searchParam){
-      this.fetchImagesWithParams(this.state.searchParam);
-      }
+   const closeModalWindow =() =>{
+    setIsModalOpen(false)
+  }
+  
+  useEffect(()=>{
+    if(!isFirstRender.current){
+      fetchImagesWithParams()
+    };
+    return () => isFirstRender.current = false;
+  }, [searchParam]);
 
-    if(prevState.page !== this.state.page){
-        this.fetchImagesWithPagination(this.state.page)
-      }
-    }
-
-  render() {
+  useEffect(()=>{
+    if(!isFirstRender.current){
+        fetchImagesWithPagination()
+      };
+      return () => isFirstRender.current = false;
+    },[page]);
 
     const totalHits = JSON.parse(localStorage.getItem('resp'))?.totalHits;
-    const shownHits = Array.isArray(this.state.img) ? this.state.img.length : undefined;
-    const showButton = totalHits!==0 && this.state.status==='success';
+    const shownHits = Array.isArray(images) ? images.length : undefined;
+    const showButton = totalHits!==0 && status==='success';
 
     return (
       <div>
         <Searchbar
-        handleSearchSubmit={this.handleSearchSubmit}/>
+        handleSearchSubmit={handleSearchSubmit}/>
 
         <ImageGallery
-        images={this.state.img}
-        searchParam={this.state.searchParam}
-        openModalWindow={this.openModalWindow}
+        images={images}
+        searchParam={searchParam}
+        openModalWindow={openModalWindow}
         />
 
-        {this.state.status==='pending' && <Loader/>}
+        {status==='pending' && <Loader/>}
 
-        {(showButton && shownHits!==totalHits) && <Button handleLoadMore={this.handleLoadMore}/>
+        {(showButton && shownHits!==totalHits) && <Button handleLoadMore={handleLoadMore}/>
         }
 
         {totalHits===0 && <p className='errorTitle'>Nothing was found...</p>}
-        {this.state.status==='error'&& <p className='errorTitle'>Oops, some error occurred.. </p>}
+        {status==='error'&& <p className='errorTitle'>Oops, some error occurred.. </p>}
        
-        {this.state.isModalOpen && 
+        {isModalOpen && 
         <Modal
-        imgURL={this.state.modalImgURL}
-        closeModalWindow={this.closeModalWindow}
+        imgURL={modalImgURL}
+        closeModalWindow={closeModalWindow}
         />}
       </div>
     )
-  }
 }
 
