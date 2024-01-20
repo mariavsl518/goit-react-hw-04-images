@@ -64,6 +64,7 @@ export const App=()=> {
 
   useEffect(()=>{
     if(searchParam){
+      setPage(1)
       fetchImagesWithParams()
     }
   }, [searchParam]);
