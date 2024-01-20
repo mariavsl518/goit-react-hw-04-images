@@ -7,9 +7,9 @@ import { Button } from './Button/Button';
 import { Modal } from './Modal/Modal';
 import { Loader } from './Loader/Loader';
 
-export const App=()=> {
+export const App = () => {
 
-  const [images, setImages] = useState(null);
+  const [images, setImages] = useState([]);
   const [modalImgURL, setModalImgURL] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [status, setStatus] = useState('idle');
