@@ -58,23 +58,24 @@ export const App=()=> {
     setIsModalOpen(true)
   }
 
-   const closeModalWindow =() =>{
+   const closeModalWindow = () =>{
     setIsModalOpen(false)
   }
-  
+
   useEffect(()=>{
     if(!isFirstRender.current){
       fetchImagesWithParams()
-    };
+    }
     return () => isFirstRender.current = false;
-  }, [searchParam]);
+  }, [searchParam])
 
   useEffect(()=>{
     if(!isFirstRender.current){
         fetchImagesWithPagination()
-      };
-      return () => isFirstRender.current = false;
-    },[page]);
+      }
+    return () => isFirstRender.current = false;
+    }, [page])
+  
 
     const totalHits = JSON.parse(localStorage.getItem('resp'))?.totalHits;
     const shownHits = Array.isArray(images) ? images.length : undefined;

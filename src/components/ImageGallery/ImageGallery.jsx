@@ -7,7 +7,6 @@ export const ImageGallery = ({images, openModalWindow}) => {
     <ul className={css.imgGallery}>
         { images?.map(img => {
         return (<ImageGalleryItem
-            key={img.id}
             id={img.id}
             url={img.webformatURL}
             openModalWindow={openModalWindow}
