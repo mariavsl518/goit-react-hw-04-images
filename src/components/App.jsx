@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { getImages } from 'services/api';
 
 import { Searchbar } from './Searchbar/Searchbar';
@@ -17,20 +17,21 @@ export const App=()=> {
   const [page, setPage] = useState(1);
   const isFirstRender = useRef(true);
 
-  async function fetchImagesWithParams(searchParam) {
+  async function fetchImagesWithParams() {
     try{
       setStatus('pending');
       setImages(null);
       const img = await getImages(searchParam, page)
       setStatus('success');
       setImages(img);
+      console.log(images);
     }
     catch{
       setStatus('error')
     }
   }
 
-  async function fetchImagesWithPagination(page) {
+  async function fetchImagesWithPagination() {
     try{
       setStatus('pending');
       const img = await getImages(searchParam, page)
@@ -65,16 +66,17 @@ export const App=()=> {
   useEffect(()=>{
     if(searchParam){
       setPage(1)
-      fetchImagesWithParams()
+      fetchImagesWithParams(searchParam)
     }
   }, [searchParam]);
 
   useEffect(() => {
-    if(!isFirstRender.current) {
-      fetchImagesWithPagination()
+    if (!isFirstRender.current) {
+      fetchImagesWithPagination(page);
+    } else {
+      isFirstRender.current = false;
     }
-    return () => isFirstRender.current = false
-  }, [page]);
+    }, [page]);
   
 
     const totalHits = JSON.parse(localStorage.getItem('resp'))?.totalHits;
