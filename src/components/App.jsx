@@ -24,7 +24,6 @@ export const App = () => {
       const img = await getImages(searchParam, page)
       setStatus('success');
       setImages(img);
-      console.log(images);
     }
     catch{
       setStatus('error')
@@ -72,6 +71,8 @@ export const App = () => {
 
   useEffect(() => {
     if (!isFirstRender.current) {
+      console.log(isFirstRender.current);
+      console.log('not first render');
       fetchImagesWithPagination(page);
     } else {
       isFirstRender.current = false;
