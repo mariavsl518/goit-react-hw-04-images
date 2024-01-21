@@ -29,10 +29,10 @@
 
   .button {
     display: inline-block;
-    width: 48px;
+    width: 90px;
     height: 48px;
+    padding-top: 5px;
     border: 0;
-    /* background-image: url(); */
     background-size: 40%;
     background-repeat: no-repeat;
     background-position: center;
@@ -47,15 +47,10 @@
   }
 
   .buttonLabel {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    clip-path: inset(50%);
-    border: 0;
+
+    color: blue;
+    font-size: large;
+    font-style: bold;
   }
 
   .input {
